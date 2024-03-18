@@ -44,7 +44,7 @@ resource "aws_iam_policy" "lambda_db_proxy_policy" {
           "rds-db:connect"
         ],
         Resource = [
-          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_db_proxy.var_db_proxy.id}/${var.db_user}"
+          "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_db_proxy.db_proxy.id}/${var.db_user}"
         ]
       }
     ]
@@ -52,7 +52,7 @@ resource "aws_iam_policy" "lambda_db_proxy_policy" {
 }
 
 #resource "aws_iam_policy" "lambda_rds_policy" {
-#  name        = "VarRDSLambdaPolicy"
+#  name        = "RDSLambdaPolicy"
 #  description = "Policy to allow Lambda function to manage RDS DB"
 #
 #  policy = jsonencode({

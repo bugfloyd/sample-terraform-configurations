@@ -1,9 +1,9 @@
 resource "aws_rds_cluster" "aurora_serverless_cluster" {
-  cluster_identifier = "var-aurora-cluster1"
+  cluster_identifier = "aurora-cluster1"
   engine             = "aurora-postgresql"
   engine_mode        = "provisioned" # Use "provisioned" for Serverless v2
   engine_version     = "15.4"
-  database_name      = "varmain"
+  database_name      = "main"
   master_username    = var.db_user
   manage_master_user_password = true
   skip_final_snapshot         = true # Enable for production
@@ -26,12 +26,12 @@ resource "aws_db_subnet_group" "aurora_subnet_group" {
   subnet_ids = [var.private_subnet_id_az1, var.private_subnet_id_az2]
 
   tags = {
-    Name = "VAR Aurora Subnet Group"
+    Name = "Aurora Subnet Group"
   }
 }
 
-resource "aws_db_proxy" "var_db_proxy" {
-  name           = "var-db-proxy"
+resource "aws_db_proxy" "db_proxy" {
+  name           = "db-proxy"
   engine_family  = "POSTGRESQL"
   role_arn       = aws_iam_role.db_proxy_role.arn
   vpc_subnet_ids = [var.private_subnet_id_az1, var.private_subnet_id_az2]
@@ -49,12 +49,12 @@ resource "aws_db_proxy" "var_db_proxy" {
   vpc_security_group_ids = [aws_security_group.rds_proxy_sg.id]
 
   tags = {
-    Name = "var-db-proxy"
+    Name = "db-proxy"
   }
 }
 
 resource "aws_iam_role" "db_proxy_role" {
-  name = "var-db-proxy-role"
+  name = "db-proxy-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -69,7 +69,7 @@ resource "aws_iam_role" "db_proxy_role" {
 }
 
 resource "aws_iam_policy" "db_proxy_policy" {
-  name        = "var-db-proxy-policy"
+  name        = "db-proxy-policy"
   description = "A policy for the DB proxy to access secrets"
 
   policy = jsonencode({
@@ -91,7 +91,7 @@ resource "aws_iam_role_policy_attachment" "db_proxy_policy_attachment" {
 }
 
 resource "aws_db_proxy_default_target_group" "main" {
-  db_proxy_name = aws_db_proxy.var_db_proxy.name
+  db_proxy_name = aws_db_proxy.db_proxy.name
 
   connection_pool_config {
     max_connections_percent      = 100
@@ -102,7 +102,7 @@ resource "aws_db_proxy_default_target_group" "main" {
 }
 
 resource "aws_db_proxy_target" "main" {
-  db_proxy_name         = aws_db_proxy.var_db_proxy.name
+  db_proxy_name         = aws_db_proxy.db_proxy.name
   target_group_name     = "default"
   db_cluster_identifier = aws_rds_cluster.aurora_serverless_cluster.id # For an Aurora cluster
 }
