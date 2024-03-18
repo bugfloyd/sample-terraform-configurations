@@ -1,0 +1,6 @@
+/client_vpn_endpoint/vpn_client.key
+/client_vpn_endpoint/vpn_client.csr
+/client_vpn_endpoint/vpn_client.crt
+/client_vpn_endpoint/vpn_ca.srl
+/client_vpn_endpoint/vpn_ca.pem
+/client_vpn_endpoint/vpn_ca.key
